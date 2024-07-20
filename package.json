@@ -6,11 +6,11 @@
   "module": "./lib/bundle.esm.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "dev": "mocha",
+    "dev": "npx mocha",
     "pub": "npm publish --access public",
-    "docs": "typedoc src/index.ts",
+    "docs": "npx typedoc src/index.ts",
     "clean": "rm -rf lib",
-    "build": "npm run clean && rollup -c --bundleConfigAsCjs"
+    "build": "npm run clean && npx rollup -c --bundleConfigAsCjs"
   },
   "keywords": [
     "qq",
