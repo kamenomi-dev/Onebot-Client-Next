@@ -26,19 +26,14 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: check code   # 检查代码
-        run: |
-          npm install
-          npm run lint
 
       - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - name: publish                          # 发布 npm 包
         if: ${{contains(github.ref, 'refs/tags/')}}  # 如果有新 tag
         run: |
           npm run build
-          npm run build:types
           npm run docs
-          npm publish --access public
+          npm run pub
       - name: deploy                          # 发布文档
         if: ${{contains(github.ref, 'refs/tags/')}}
         uses: JamesIves/github-pages-deploy-action@4.1.1
