@@ -1,5 +1,3 @@
-// exclude path.
-
 .vs
 .vscode
 node_modules
