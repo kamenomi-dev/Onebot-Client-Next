@@ -2,9 +2,17 @@
   "name": "onebot-client-next",
   "version": "0.0.1",
   "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
-  "main": "null",
+  "main": "lib/bundle.cjs.js",
+  "module": "lib/bundle.esm.js",
+  "types": "types/index.d.ts",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "pub": "npm publish --access public",
+    "docs": "typedoc src/index.ts",
+    "lint": "prettier --check ./**/*.{ts,js,vue}",
+    "clean": "rm -rf lib",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "build:types": "tsc -build"
   },
   "keywords": [
     "qq",
@@ -15,8 +23,15 @@
   "author": "Kamenomi",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^8.2.1",
     "@types/ws": "^8.5.11",
-    "mocha": "^10.6.0"
+    "mocha": "^10.6.0",
+    "rollup": "^2.45.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "typedoc": "^0.26.4"
   },
   "dependencies": {
     "eventemitter3": "^5.0.1",
@@ -25,5 +40,10 @@
     "typescript-logging": "^2.2.0",
     "typescript-logging-log4ts-style": "^2.2.0",
     "ws": "^8.18.0"
-  }
+  },
+  "files": [
+    "lib/**/*.*",
+    "LICENSE",
+    "readme.md"
+  ]
 }
