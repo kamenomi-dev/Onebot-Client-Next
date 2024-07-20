@@ -1,0 +1,29 @@
+{
+  "name": "onebot-client-next",
+  "version": "0.0.1",
+  "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
+  "main": "null",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "qq",
+    "qqbot",
+    "onebot",
+    "onebot-v11"
+  ],
+  "author": "Kamenomi",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "@types/ws": "^8.5.11",
+    "mocha": "^10.6.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.3",
+    "typescript-logging": "^2.2.0",
+    "typescript-logging-log4ts-style": "^2.2.0",
+    "ws": "^8.18.0"
+  }
+}

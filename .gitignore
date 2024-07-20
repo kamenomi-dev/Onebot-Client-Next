@@ -1,0 +1,9 @@
+// exclude path.
+
+.vs
+.vscode
+node_modules
+dist
+
+*.zip
+*.log
