@@ -9,7 +9,7 @@
     "dev": "npx mocha",
     "pub": "npm publish --access public",
     "docs": "npx typedoc src/index.ts",
-    "clean": "rm -rf lib",
+    "clean": "",
     "build": "npm run clean && npx rollup -c --bundleConfigAsCjs"
   },
   "keywords": [
