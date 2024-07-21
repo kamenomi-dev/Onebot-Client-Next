@@ -6,5 +6,5 @@ const client = new Client(/* user_id */ 123456, {
 
 // More see src
 client.Start().then(() => {
-  client.on("~~~~~~~~~~~~~~~~~~~", () => {});
+  client.on("message.group.normal", (a) => {a});
 });

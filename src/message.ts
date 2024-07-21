@@ -347,7 +347,12 @@ export namespace Segment {
     },
 
     /** 图片(支持http://,base64://) */
-    Image(file: string, cache?: boolean, proxy?: boolean, timeout?: number): TSegmentImage {
+    Image(
+      file: string,
+      cache?: boolean,
+      proxy?: boolean,
+      timeout?: number
+    ): TSegmentImage {
       return {
         type: "image",
         data: {
@@ -360,7 +365,12 @@ export namespace Segment {
     },
 
     /** 闪照(支持http://,base64://) */
-    Flash(file: string, cache?: boolean, proxy?: boolean, timeout?: number): TSegmentImage {
+    Flash(
+      file: string,
+      cache?: boolean,
+      proxy?: boolean,
+      timeout?: number
+    ): TSegmentImage {
       return {
         type: "image",
         data: {
@@ -411,7 +421,12 @@ export namespace Segment {
     },
 
     /** 链接分享 */
-    Share(url: string, title: string, image?: string, content?: string): TSegmentShare {
+    Share(
+      url: string,
+      title: string,
+      image?: string,
+      content?: string
+    ): TSegmentShare {
       return {
         type: "share",
         data: {
@@ -424,7 +439,12 @@ export namespace Segment {
     },
 
     /** 位置分享 */
-    Location(lat: number, lng: number, address: string, id?: string): TSegmentLocation {
+    Location(
+      lat: number,
+      lng: number,
+      address: string,
+      id?: string
+    ): TSegmentLocation {
       return {
         type: "location",
         data: {
@@ -454,7 +474,9 @@ export namespace Segment {
       let prevIdx = 0;
 
       for (let token of matchedTokens) {
-        const text = strData.slice(prevIdx, token.index).replace(/&#91;|&#93;|&amp;/g, UnescapeCQ);
+        const text = strData
+          .slice(prevIdx, token.index)
+          .replace(/&#91;|&#93;|&amp;/g, UnescapeCQ);
 
         if (text) {
           resultElements.push({ type: "text", data: { text } });
@@ -469,7 +491,9 @@ export namespace Segment {
       }
 
       if (prevIdx < strData.length) {
-        const text = strData.slice(prevIdx).replace(/&#91;|&#93;|&amp;/g, UnescapeCQ);
+        const text = strData
+          .slice(prevIdx)
+          .replace(/&#91;|&#93;|&amp;/g, UnescapeCQ);
         if (text) {
           resultElements.push({ type: "text", data: { text } });
         }
@@ -499,7 +523,9 @@ export namespace Segment {
     for (let v of split) {
       const i = v.indexOf(equal);
       if (i === -1) continue;
-      ret[v.substring(0, i)] = v.substr(i + 1).replace(/&#44;|&#91;|&#93;|&amp;/g, UnescapeCQInside);
+      ret[v.substring(0, i)] = v
+        .substr(i + 1)
+        .replace(/&#44;|&#91;|&#93;|&amp;/g, UnescapeCQInside);
     }
     for (let k in ret) {
       try {
@@ -510,7 +536,10 @@ export namespace Segment {
   }
 }
 
-export type TElements = string | Segment.TSegment | Array<Segment.TSegment | string>;
+export type TElements =
+  | string
+  | Segment.TSegment
+  | Array<Segment.TSegment | string>;
 
 export namespace MessageEvent {
   export type TEvent = {
@@ -528,7 +557,7 @@ export namespace MessageEvent {
     font: number;
     message: TElements;
     raw_message: string;
-    reply(message: TElements, auto_escape?: boolean): void;
+    reply(message: TElements, at_sender?: boolean, auto_escape?: boolean): void;
   };
 
   export type TPrivateMessageEvent = TMessageEvent & {
@@ -555,12 +584,35 @@ export namespace MessageEvent {
     group_id: number;
     anonymous: TAnonymous | null;
     sender: TGroupMemberSender;
-    reply(
-      message: TElements,
-      auto_escape?: boolean,
-      at_sender?: boolean,
-      deleteMsg?: boolean,
-      operator_action?: { kick?: boolean; ban: boolean; ban_duration?: number },
+    reply(message: TElements, at_sender?: boolean, auto_escape?: boolean): void;
+    recall(): void;
+    kick(): void;
+    mute(ban_duration?: number): void;
+  };
+
+  export type TPrivateMessageEventMap = {
+    "message.private"(event: TPrivateMessageEvent): void;
+    "message.private.friend"(
+      event: TPrivateMessageEvent & { sub_type: "friend" }
+    ): void;
+    "message.private.group"(
+      event: TPrivateMessageEvent & { sub_type: "group" }
+    ): void;
+    "message.private.other"(
+      event: TPrivateMessageEvent & { sub_type: "other" }
+    ): void;
+  };
+
+  export type TGroupMessageEventMap = {
+    "message.group"(event: TGroupMessageEvent): void;
+    "message.group.normal"(
+      event: TGroupMessageEvent & { sub_type: "normal" }
+    ): void;
+    "message.group.anonymous"(
+      event: TGroupMessageEvent & { sub_type: "anonymous" }
+    ): void;
+    "message.group.notice"(
+      event: TGroupMessageEvent & { sub_type: "notice" }
     ): void;
   };
 }
@@ -631,9 +683,33 @@ export namespace NoticeEvent {
   };
 
   export type TFriendMessageRecallevent = TNoticeEvent & {
-    notice_type: "griend_recall";
+    notice_type: "friend_recall";
     user_id: number;
     message_id: number;
+  };
+
+  export type TGroupNoticeEventMap = {
+    "notice"(
+      event:
+        | TGroupFileUploadEvent
+        | TGroupAdminChangeEvent
+        | TGroupMemberDecreaseEvent
+        | TGroupMemberIncreaseEvent
+        | TGroupMuteEvent
+        | TGroupMessageRecallEvent
+    ): void;
+    "notice.group_upload"(event: TGroupFileUploadEvent): void;
+    "notice.group_admin"(event: TGroupAdminChangeEvent): void;
+    "notice.group_decrease"(event: TGroupMemberDecreaseEvent): void;
+    "notice.group_increase"(event: TGroupMemberIncreaseEvent): void;
+    "notice.group_ban"(event: TGroupMuteEvent): void;
+    "notice.group_recall"(event: TGroupMessageRecallEvent): void;
+  };
+
+  export type TFriendNoticeEventMap = {
+    "notice"(event: TFriendAddEvent | TFriendMessageRecallevent): void;
+    "notice.friend_add"(event: TFriendAddEvent): void;
+    "notice.friend_recall"(event: TFriendMessageRecallevent): void;
   };
 }
 
@@ -660,6 +736,21 @@ export namespace RequestEvent {
     comment: string;
     flag: string;
   };
+
+  export type TGroupRequestEventMap = {
+    "request"(event: TMemberAddOrInviteEvent): void;
+    "request.group.add"(
+      event: TMemberAddOrInviteEvent & { sub_type: "add" }
+    ): void;
+    "request.group.invite"(
+      event: TMemberAddOrInviteEvent & { sub_type: "invite" }
+    ): void;
+  };
+
+  export type TFriendRequestEventMap = {
+    "request"(event: TFriendInviteEvent): void;
+    "requst.friend"(event: TFriendInviteEvent): void;
+  };
 }
 
 export namespace MetaEvent {
@@ -679,5 +770,11 @@ export namespace MetaEvent {
     meta_event_type: "heartbeat";
     status: TStatus;
     interval: number;
+  };
+
+  export type TMetaEventMap = {
+    "meta_event"(event: TLifeCycleEvent | THeartbeatEvent): void;
+    "meta_event.lifecycle"(event: TLifeCycleEvent): void;
+    "meta_event.heartbeat"(event: THeartbeatEvent): void;
   };
 }

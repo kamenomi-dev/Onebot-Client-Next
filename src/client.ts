@@ -1,14 +1,18 @@
 import { BaseClient, TClientConfig } from "./base_client";
+import { OnebotClient } from "./event";
 import { TGroupInfo, TGroupMemberInfo } from "./group";
 import { MessageEvent, NoticeEvent, TElements } from "./message";
 import { TFriendInfo } from "./user";
 
-export class Client extends BaseClient {
+export class Client extends BaseClient<OnebotClient.EventMap> {
   public friend_map = new Map<number, TFriendInfo>();
   public group_map = new Map<number, TGroupInfo>();
   public group_member_map = new Map<number, Map<number, TGroupMemberInfo>>();
 
-  public constructor(public readonly bot_user_id: number, public readonly config: TClientConfig) {
+  public constructor(
+    public readonly bot_user_id: number,
+    public readonly config: TClientConfig
+  ) {
     super(bot_user_id, config);
   }
 
@@ -36,6 +40,10 @@ export class Client extends BaseClient {
     this.EventProcessorInit();
   }
 
+  public Stop() {
+    this.Disconnect();
+  }
+
   private EventProcessorInit() {
     this.connection?.on("message", (rawData) => {
       const data = <MessageEvent.TEvent>JSON.parse(rawData.toString());
@@ -44,27 +52,40 @@ export class Client extends BaseClient {
 
       if (data.post_type == "message") {
         let messageData = <MessageEvent.TMessageEvent>data;
-        const eventName = ["message", messageData.message_type, messageData.sub_type].join(".");
+        const eventName = [
+          "message",
+          messageData.message_type,
+          messageData.sub_type,
+        ].join(".");
+
+        messageData.reply = (message, ...args: any[]) => {
+          this.QuickReply(messageData, message, ...args);
+        };
 
         if (messageData.message_type == "private") {
-          const msgData = <MessageEvent.TPrivateMessageEvent>messageData;
-
-          let messageEvent = msgData;
-          messageEvent.reply = (message, auto_escape?: boolean) => {
-            this.QuickReply(msgData, message, auto_escape);
-          };
-
-          this.emit(eventName, messageEvent);
+          this.EmitEvent(eventName, messageData);
           return;
         }
 
-        const msgData = <MessageEvent.TGroupMessageEvent>messageData;
-        let messageEvent = msgData;
+        let messageEvent = <MessageEvent.TGroupMessageEvent>messageData;
+
         messageEvent.reply = (message: TElements, ...args: any[]) => {
           this.QuickReply(messageEvent, message, ...args);
         };
 
-        this.emit(eventName, messageEvent);
+        messageEvent.recall = () => {
+          this.QuickRecall(messageEvent);
+        };
+
+        messageEvent.kick = () => {
+          this.QuickKick(messageEvent);
+        };
+
+        messageEvent.mute = (time?: number) => {
+          this.QuickMute(messageEvent, time);
+        };
+
+        this.EmitEvent(eventName, messageEvent);
         return;
       }
 
@@ -74,10 +95,25 @@ export class Client extends BaseClient {
         let msgData = <NoticeEvent.TNoticeEvent>data;
         const eventName = ["notice", msgData.notice_type].join(".");
 
-        this.emit(eventName, msgData);
+        this.EmitEvent(eventName, msgData);
         return;
       }
     });
+  }
+
+  private EmitEvent(eventName: string, data: object, isBubble?: boolean) {
+    if (!isBubble) {
+      this.emit(<any>eventName, data);
+      return;
+    }
+
+    let eventBlock = eventName.split(".");
+
+    for (let _event of eventBlock) {
+      this.emit(<any>eventBlock.join("."), data);
+
+      eventBlock.pop();
+    }
   }
 
   /**
@@ -99,7 +135,12 @@ export class Client extends BaseClient {
    * @param approve 是否同意请求／邀请，默认为 true
    * @param reason 拒绝理由（仅在拒绝时有效），more为空
    */
-  public SetGroupAddRequest(flag: string, sub_type: "add" | "invite", approve?: boolean, reason?: string) {
+  public SetGroupAddRequest(
+    flag: string,
+    sub_type: "add" | "invite",
+    approve?: boolean,
+    reason?: string
+  ) {
     this.CallApi("set_group_add_request", { flag, sub_type, approve, reason });
   }
 

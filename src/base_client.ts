@@ -4,16 +4,28 @@ import LoggerProvider, { Logger } from "./logger";
 import { IOnebotExports } from "./interface";
 import { MessageEvent, TElements } from "./message";
 
+type TBaseClientEventMap = {
+  "data"(data: string): void;
+  "open"(event: WebSocket.Event): void;
+  "error"(event: WebSocket.ErrorEvent): void;
+  "close"(event: WebSocket.CloseEvent): void;
+}
+
 export type TClientConfig = {
   websocket_address: string;
   accent_token?: string;
 };
 
-export class BaseClient extends EventEmitter {
+export class BaseClient<
+  U extends Record<string, (...args: any[]) => any>
+> extends EventEmitter<U & TBaseClientEventMap> {
   public connection?: WebSocket;
   public logger: Logger;
 
-  public constructor(public readonly bot_user_id: number, public readonly config: TClientConfig) {
+  public constructor(
+    public readonly bot_user_id: number,
+    public readonly config: TClientConfig
+  ) {
     super();
     this.logger = LoggerProvider.getLogger(`Client.${bot_user_id}`);
   }
@@ -87,36 +99,38 @@ export class BaseClient extends EventEmitter {
     });
   }
 
-  public QuickReply(from: MessageEvent.TPrivateMessageEvent, context: TElements, auto_escape?: boolean): void;
-  public QuickReply(
-    from: MessageEvent.TGroupMessageEvent,
-    context: TElements,
-    auto_escape?: boolean,
-    at_sender?: boolean,
-    deleteMsg?: boolean,
-    operator_action?: { kick?: boolean; ban: boolean; ban_duration?: number },
-  ): void;
   public QuickReply(
     from: MessageEvent.TMessageEvent,
     context: TElements,
     auto_escape?: boolean,
-    at_sender?: boolean,
-    deleteMsg?: boolean,
-    operator_action?: { kick?: boolean; ban: boolean; ban_duration?: number },
+    at_sender?: boolean
   ) {
-    if (from.message_type == "private") {
-      return this.QuickCallApi(from, {
-        reply: context,
-        auto_escape,
-      });
-    }
-
     return this.QuickCallApi(from, {
       reply: context,
       auto_escape,
       at_sender,
-      deleteMsg,
-      ...operator_action,
+    });
+  }
+
+  public QuickRecall(from: MessageEvent.TGroupMessageEvent) {
+    return this.QuickCallApi(from, {
+      delete: true,
+    });
+  }
+
+  public QuickKick(from: MessageEvent.TGroupMessageEvent) {
+    return this.QuickCallApi(from, {
+      kick: true,
+    });
+  }
+
+  public QuickMute(
+    from: MessageEvent.TGroupMessageEvent,
+    ban_duration?: number
+  ) {
+    return this.QuickCallApi(from, {
+      ban: true,
+      ban_duration,
     });
   }
 
@@ -126,7 +140,7 @@ export class BaseClient extends EventEmitter {
 
   private __OpenHandler(event: WebSocket.Event) {
     this.logger.debug(
-      `Success to connect server ${this.config.websocket_address} with token ${this.config.accent_token}`,
+      `Success to connect server ${this.config.websocket_address} with token ${this.config.accent_token}`
     );
 
     this.emit("open", event);
@@ -145,7 +159,9 @@ export class BaseClient extends EventEmitter {
   }
 
   private __CloseHandler(event: WebSocket.CloseEvent) {
-    this.logger.debug(`Success to disconnet from server ${this.config.websocket_address}`);
+    this.logger.debug(
+      `Success to disconnet from server ${this.config.websocket_address}`
+    );
 
     this.emit("close", event);
   }
