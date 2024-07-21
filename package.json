@@ -1,7 +1,7 @@
 {
   "name": "onebot-client-next",
   "type": "commonjs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
   "main": "./lib/bundle.js",
   "types": "./lib/index.d.ts",
