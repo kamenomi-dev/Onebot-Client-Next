@@ -30,7 +30,7 @@ export type TGroupMemberInfo = {
 };
 
 export class Group {
-  private memberMap = new Map<number, Member>();
+  private member_map = new Map<number, Member>();
 
   public static As(client: Client, group_id: number) {
     let groupInfo = client.group_map.get(group_id);
@@ -46,7 +46,7 @@ export class Group {
     let memberMap = this.client.group_member_map.get(group_id);
     if (memberMap) {
       [...memberMap.keys()].forEach((user_id) => {
-        this.memberMap.set(user_id, Member.As(client, group_id, user_id));
+        this.member_map.set(user_id, Member.As(client, group_id, user_id));
       });
     }
   }

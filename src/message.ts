@@ -1,5 +1,14 @@
-import { TAnonymous, TStatus } from "./interface";
+import { TStatus } from "./interface";
 import { TGender, TStrangerInfo } from "./user";
+
+export type TMessage = {
+  time: number;
+  message_type: string;
+  message_id: number;
+  real_id: number;
+  sender: TStrangerInfo;
+  message: TElements;
+};
 
 export namespace Segment {
   export type TSegmentBase = {
@@ -578,6 +587,12 @@ export namespace MessageEvent {
     title: string;
   };
 
+  export type TAnonymous = {
+    id: number;
+    name: string;
+    flag: string;
+  };
+
   export type TGroupMessageEvent = TMessageEvent & {
     message_type: "group";
     sub_type: "normal" | "anonymous" | "notice";
@@ -716,25 +731,22 @@ export namespace NoticeEvent {
 export namespace RequestEvent {
   export type TRequestEvent = MessageEvent.TEvent & {
     post_type: "request";
-    request_type: "friend";
-  };
-
-  export type TFriendInviteEvent = TRequestEvent & {
-    post_type: "request";
-    request_type: "friend";
+    request_type: "friend" | "group";
     user_id: number;
     comment: string;
     flag: string;
+  };
+
+  export type TFriendAddInviteEvent = TRequestEvent & {
+    request_type: "friend";
+    approve(isApprove?: boolean, remark?: string): void;
   };
 
   export type TMemberAddOrInviteEvent = TRequestEvent & {
-    post_type: "request";
     request_type: "group";
     sub_type: "add" | "invite";
     group_id: number;
-    user_id: number;
-    comment: string;
-    flag: string;
+    approve(isApprove?: boolean, reason?: string): void;
   };
 
   export type TGroupRequestEventMap = {
@@ -748,24 +760,24 @@ export namespace RequestEvent {
   };
 
   export type TFriendRequestEventMap = {
-    "request"(event: TFriendInviteEvent): void;
-    "requst.friend"(event: TFriendInviteEvent): void;
+    "request"(event: TFriendAddInviteEvent): void;
+    "request.friend"(event: TFriendAddInviteEvent): void;
   };
 }
 
 export namespace MetaEvent {
-  export type TMetaEvent = {
+  export type TMetaEvent = MessageEvent.TEvent & {
     post_type: "meta_event";
     meta_event_type: string;
   };
 
-  export type TLifeCycleEvent = MessageEvent.TEvent & {
+  export type TLifeCycleEvent =TMetaEvent & {
     post_type: "meta_event";
     meta_event_type: "lifecycle";
     sub_type: "enable" | "disable" | "connect";
   };
 
-  export type THeartbeatEvent = MessageEvent.TEvent & {
+  export type THeartbeatEvent = TMetaEvent & {
     post_type: "meta_event";
     meta_event_type: "heartbeat";
     status: TStatus;

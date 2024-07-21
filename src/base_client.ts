@@ -1,33 +1,43 @@
-import EventEmitter from "eventemitter3";
-import WebSocket from "ws";
-import LoggerProvider, { Logger } from "./logger";
+import { OnebotClient } from "./event";
 import { IOnebotExports } from "./interface";
-import { MessageEvent, TElements } from "./message";
+import { MessageEvent, RequestEvent, TElements } from "./message";
 
-type TBaseClientEventMap = {
+import WebSocket from "ws";
+import EventEmitter from "eventemitter3";
+import Logger, {ILogger, ILogLevel} from "js-logger";
+
+export type TBaseClientEventMap = {
   "data"(data: string): void;
   "open"(event: WebSocket.Event): void;
   "error"(event: WebSocket.ErrorEvent): void;
   "close"(event: WebSocket.CloseEvent): void;
-}
+};
 
 export type TClientConfig = {
   websocket_address: string;
   accent_token?: string;
+  options?: {
+    skip_logo?: boolean;
+    logger_level?: ILogLevel;
+  };
 };
 
-export class BaseClient<
-  U extends Record<string, (...args: any[]) => any>
-> extends EventEmitter<U & TBaseClientEventMap> {
+export class BaseClient extends EventEmitter<
+  OnebotClient.EventMap & TBaseClientEventMap
+> {
   public connection?: WebSocket;
-  public logger: Logger;
+  public logger: ILogger;
 
   public constructor(
     public readonly bot_user_id: number,
     public readonly config: TClientConfig
   ) {
     super();
-    this.logger = LoggerProvider.getLogger(`Client.${bot_user_id}`);
+
+    Logger.useDefaults({
+      defaultLevel: config.options?.logger_level || Logger.INFO
+    });
+    this.logger = Logger.get(`OnebotClient.BaseClient.${bot_user_id}`);
   }
 
   public Connect() {
@@ -89,8 +99,6 @@ export class BaseClient<
 
   /**
    * @ignore Internal methods
-   * @param context
-   * @param operation
    */
   public QuickCallApi(context: object, operation: object) {
     return this.CallApi(".handle_quick_operation", {
@@ -99,6 +107,9 @@ export class BaseClient<
     });
   }
 
+  /**
+   * @ignore Internal methods, common message operation
+   */
   public QuickReply(
     from: MessageEvent.TMessageEvent,
     context: TElements,
@@ -112,18 +123,27 @@ export class BaseClient<
     });
   }
 
+  /**
+   * @ignore Internal methods, common message operation
+   */
   public QuickRecall(from: MessageEvent.TGroupMessageEvent) {
     return this.QuickCallApi(from, {
       delete: true,
     });
   }
 
+  /**
+   * @ignore Internal methods, common group message operation
+   */
   public QuickKick(from: MessageEvent.TGroupMessageEvent) {
     return this.QuickCallApi(from, {
       kick: true,
     });
   }
 
+  /**
+   * @ignore Internal methods, common group message operation
+   */
   public QuickMute(
     from: MessageEvent.TGroupMessageEvent,
     ban_duration?: number
@@ -131,6 +151,34 @@ export class BaseClient<
     return this.QuickCallApi(from, {
       ban: true,
       ban_duration,
+    });
+  }
+
+  /**
+   * @ignore Internal methods, friend add request operation
+   */
+  public QuickFriendApprove(
+    from: RequestEvent.TFriendAddInviteEvent,
+    isApprove: boolean = true,
+    remark?: string
+  ) {
+    return this.QuickCallApi(from, {
+      approve: isApprove,
+      remark,
+    });
+  }
+
+  /**
+   * @ignore Internal methods, group add or request request operation
+   */
+  public QuickGroupAddOrInviteApprove(
+    from: RequestEvent.TMemberAddOrInviteEvent,
+    isApprove: boolean = true,
+    reason?: string
+  ) {
+    return this.QuickCallApi(from, {
+      approve: isApprove,
+      reason,
     });
   }
 
@@ -147,18 +195,25 @@ export class BaseClient<
   }
 
   private __MessageHandler(event: WebSocket.MessageEvent) {
-    this.logger.debug(`Message Received! ${event.data}`);
+    let data = JSON.parse(event.data.toString());
 
-    let jsonData = JSON.parse(event.data.toString());
-    this.emit("data", jsonData);
+    if (data["status"] == "failed") {
+      this.emit("error", data);
+      return;
+    }
+
+    this.logger.debug(`Message Received! ${event.data.toString()}`);
+    this.emit("data", data);
   }
 
-  private __ErrorHandler(event: WebSocket.ErrorEvent) {
-    this.logger.error(`Native error! ${event}`);
+  private __ErrorHandler(event: any) {
+    this.logger.error(`Native error! ${event["message"]}`);
+
     this.emit("error", event);
+    this.Disconnect();
   }
 
-  private __CloseHandler(event: WebSocket.CloseEvent) {
+  private __CloseHandler(event: any) {
     this.logger.debug(
       `Success to disconnet from server ${this.config.websocket_address}`
     );

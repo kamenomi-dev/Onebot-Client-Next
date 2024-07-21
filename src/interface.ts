@@ -1,27 +1,12 @@
 import { TGroupInfo, TGroupMemberInfo } from "./group";
-import { TElements } from "./message";
+import { TElements, TMessage, MessageEvent } from "./message";
 import { TFriendInfo, TStrangerInfo } from "./user";
-
-export type TAnonymous = {
-  id: number;
-  name: string;
-  flag: string;
-};
 
 export type TStatus = { online: boolean; good: boolean };
 
-type TLoginInfo = {
+export type TLoginInfo = {
   user_id: number;
   nickname: string;
-};
-
-type TMessage = {
-  time: number;
-  message_type: string;
-  message_id: number;
-  real_id: number;
-  sender: TStrangerInfo;
-  message: TElements;
 };
 
 export interface IOnebotExports {
@@ -43,7 +28,7 @@ export interface IOnebotExports {
   set_group_ban(params: { group_id: number; user_id: number; duration?: number }): void;
   set_group_anonymous_ban(params: {
     group_id: number;
-    anonymous?: TAnonymous;
+    anonymous?: MessageEvent.TAnonymous;
     anonymous_flag?: string;
     duration?: number;
   }): void;

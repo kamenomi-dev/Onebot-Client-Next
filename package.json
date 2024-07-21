@@ -24,14 +24,15 @@
     "@types/ws": "^8.5.11",
     "mocha": "^10.6.0",
     "tslib": "^2.6.3",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.26.4",
     "typescript": "^5.5.3"
   },
   "dependencies": {
     "eventemitter3": "^5.0.1",
-    "ts-node": "^10.9.2",
-    "typescript-logging": "^2.2.0",
-    "typescript-logging-log4ts-style": "^2.2.0",
+    "i": "^0.3.7",
+    "js-logger": "^1.6.1",
+    "npm": "^10.8.2",
     "ws": "^8.18.0"
   },
   "files": [
@@ -41,7 +42,6 @@
   ],
   "exports": {
     ".": {
-      "import": "./lib/index.esm.js",
       "require": "./lib/index.js"
     },
     "./*": "./*"
