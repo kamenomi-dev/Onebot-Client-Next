@@ -21,7 +21,7 @@
 
 >  [!CAUTION]
 >
-> 在本项目或其衍生、依赖项目等有依赖于 [QQNTLiteLoader]([LiteLoaderQQNT/LiteLoaderQQNT: QQNT 插件加载器：LiteLoaderQQNT —— 轻量 · 简洁 · 开源 (github.com)](https://github.com/LiteLoaderQQNT/LiteLoaderQQNT)) 的项目出现问题、需要反馈时，请勿在简中互联网中的平台上（例如 QQ、哔哩哔哩、知乎 等服务平台）进行以包含但不止截图、文本的形式反馈。
+> 在本项目或其衍生、依赖项目等有依赖于 [QQNTLiteLoader](https://github.com/LiteLoaderQQNT/LiteLoaderQQNT) 的项目出现问题、需要反馈时，请勿在简中互联网中的平台上（例如 QQ、哔哩哔哩、知乎 等服务平台）进行以包含但不止截图、文本的形式反馈。
 
 > [!CAUTION]
 >
