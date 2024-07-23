@@ -40,6 +40,10 @@ export class BaseClient extends EventEmitter<
     this.logger = Logger.get(`OnebotClient.BaseClient.${bot_user_id}`);
   }
 
+  /**
+   * Connect to Websocket Server
+   * @async
+   */
   public Connect() {
     return new Promise<void>((resolve) => {
       this.connection = new WebSocket(this.config.websocket_address, {
@@ -58,6 +62,9 @@ export class BaseClient extends EventEmitter<
     });
   }
 
+  /**
+   * Disconnect to the Websocket Server
+   */
   public Disconnect() {
     if (this.connection) {
       this.connection.close();
@@ -65,6 +72,11 @@ export class BaseClient extends EventEmitter<
     }
   }
 
+  /**
+   * CallApi
+   * @param action api
+   * @param args arguments of api
+   */
   public CallApi<T extends keyof IOnebotExports, R extends IOnebotExports[T]>(
     action: T,
     ...args: Parameters<R>

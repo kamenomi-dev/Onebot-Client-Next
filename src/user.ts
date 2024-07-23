@@ -4,16 +4,17 @@ import { TElements } from "./message";
 
 export type TGender = "male" | "female" | "unknown";
 
-export type TStrangerInfo = {
+export type TUserInfo = {
   user_id: number;
   nickname: string;
+}
+
+export type TStrangerInfo = TUserInfo & {
   sex: TGender;
   age: number;
 };
 
-export type TFriendInfo = {
-  user_id: number;
-  nickname: string;
+export type TFriendInfo = TUserInfo & {
   remark: string;
 };
 
@@ -57,7 +58,19 @@ export class Friend {
     return new Friend(client, uid);
   }
 
-  public SendMsg(message: TElements) {
-    return this.client.CallApi("send_private_msg", { user_id: this.user_id, message });
+  /**
+   * SendMsg (send_private_msg) 发送私聊消息
+   * @param message 要发送的内容。
+   */
+  public SendMsg(message: TElements, auto_escape: boolean = false) {
+    return this.client.CallApi("send_private_msg", { user_id: this.user_id, message, auto_escape });
+  }
+
+  /**
+   * SendLike (send_like) 发送好友赞
+   * @param times 赞的次数，每个好友每天最多 10 次，默认为。
+   */
+  public SendLike(times: number = 1) {
+    return this.client.CallApi("send_like", { user_id: this.user_id, times })
   }
 }

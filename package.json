@@ -1,9 +1,9 @@
 {
   "name": "onebot-client-next",
   "type": "commonjs",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
-  "main": "./lib/bundle.js",
+  "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "dev": "npx mocha",
@@ -11,6 +11,10 @@
     "docs": "npx typedoc src/index.ts",
     "clean": "",
     "build": "npm run clean && npx tsc -build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kamenomi-dev/Onebot-Client-Next.git"
   },
   "keywords": [
     "qq",
@@ -23,16 +27,14 @@
   "devDependencies": {
     "@types/ws": "^8.5.11",
     "mocha": "^10.6.0",
-    "tslib": "^2.6.3",
     "ts-node": "^10.9.2",
+    "tslib": "^2.6.3",
     "typedoc": "^0.26.4",
     "typescript": "^5.5.3"
   },
   "dependencies": {
     "eventemitter3": "^5.0.1",
-    "i": "^0.3.7",
     "js-logger": "^1.6.1",
-    "npm": "^10.8.2",
     "ws": "^8.18.0"
   },
   "files": [
