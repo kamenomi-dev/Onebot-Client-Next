@@ -113,16 +113,16 @@ export interface IOnebotExports {
     no_cache?: boolean;
   }): TGroupMemberInfo;
   get_group_member_list(params: { group_id: number }): TGroupMemberInfo[];
-  get_group_honor_info(
-    group_id: number,
+  get_group_honor_info(params: {
+    group_id: number;
     type:
       | "talkative"
       | "performer"
       | "legend"
       | "strong_newbie"
       | "emotion"
-      | "all"
-  ): TGroupHonorInfo;
+      | "all";
+  }): TGroupHonorInfo;
   get_cookies(params: { domain?: string }): { cookies: string };
   get_csrf_token(): { token: number };
   get_credentials(params: { domain?: string }): {

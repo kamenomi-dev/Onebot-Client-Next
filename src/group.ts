@@ -29,6 +29,8 @@ export type TGroupMemberInfo = {
   card_changeable: boolean;
 };
 
+var groupCache = new Map<number, Group>();
+
 export class Group {
   private member_map = new Map<number, Member>();
 
@@ -39,10 +41,17 @@ export class Group {
       throw new Error(`Can't find group ${group_id}`);
     }
 
+    let group = groupCache.get(group_id);
+    if (typeof group != "undefined") {
+      return group;
+    }
+
     return new Group(client, group_id);
   }
 
   public constructor(private client: Client, public readonly group_id: number) {
+    groupCache.set(group_id, this);
+
     let memberMap = this.client.group_member_map.get(group_id);
     if (memberMap) {
       [...memberMap.keys()].forEach((user_id) => {
@@ -87,8 +96,11 @@ export class Group {
       | "emotion"
       | "all"
   ) {
-    return this.client.CallApi("get_group_honor_info", this.group_id, type);
-  };
+    return this.client.CallApi("get_group_honor_info", {
+      group_id: this.group_id,
+      type,
+    });
+  }
 
   public PickMember(user_id: number) {
     return Member.As(this.client, this.group_id, user_id);

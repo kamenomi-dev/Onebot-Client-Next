@@ -91,6 +91,7 @@ export class Client extends BaseClient {
 
     this.InitEventListener();
     this.logger.info(`All event listener was registered. `);
+    return this;
   }
 
   /**

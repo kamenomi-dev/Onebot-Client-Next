@@ -1,19 +1,38 @@
 import { Client } from "./client";
 import Logger from "js-logger";
+import { Group } from "./group";
 
 const client = new Client(/* user_id */ 222, {
   websocket_address: "ws://127.0.0.1:19132",
   accent_token: "a_simple_token",
   options: {
-    logger_level: Logger.DEBUG
+    logger_level: Logger.INFO
   }
 });
 
 // More see src
+let lastDragon = 0;
 client.Start().then(() => {
-  client.on("message.group.normal", (a) => {
-    if (a.raw_message == "command.current_time") {
-      a.reply((new Date).toLocaleTimeString());
+  client.on("message.group.normal", (msg) => {
+    if (msg.raw_message == "🏓 Ping") {
+      msg.reply("🏓 Pong");
     }
   });
+
+  console.log("a")
+  const group = Group.As(client, 687741706);
+  console.log(group)
+  setInterval(() => {
+    console.log("1");
+
+    group.GetHonorMembers("all").then((dragon) => {
+      if (dragon.current_talkative!.user_id != lastDragon) {
+        lastDragon = dragon.current_talkative!.user_id
+        group.SendMsg(`${dragon.current_talkative!.nickname} 龙王，喷个水`);
+      }
+      console.log(dragon)
+    }).catch(val => {
+      console.log(val)
+    });
+  }, 1000 * 10);
 });
