@@ -1,6 +1,6 @@
-import { TGroupInfo, TGroupMemberInfo } from "./group";
-import { TElements, TMessage, MessageEvent } from "./message";
-import { TFriendInfo, TStrangerInfo, TUserInfo } from "./user";
+import { TGroupInfo, TGroupMemberInfo } from "./group.js";
+import { TElements, TMessage, MessageEvent } from "./message.js";
+import { TFriendInfo, TStrangerInfo, TUserInfo } from "./user.js";
 
 export type TStatus = { online: boolean; good: boolean };
 

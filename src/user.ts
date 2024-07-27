@@ -1,6 +1,6 @@
-import { Client } from "./client";
-import { Member } from "./group";
-import { TElements } from "./message";
+import { Client } from "./client.js";
+import { Member } from "./group.js";
+import { TElements } from "./message.js";
 
 export type TGender = "male" | "female" | "unknown";
 

@@ -1,10 +1,11 @@
-import { OnebotClient } from "./event";
-import { IOnebotExports } from "./interface";
-import { MessageEvent, RequestEvent, TElements } from "./message";
+import { OnebotClient } from "./event.js";
+import { IOnebotExports } from "./interface.js";
+import { MessageEvent, RequestEvent, TElements } from "./message.js";
 
+import Console from "console"
 import WebSocket from "ws";
-import EventEmitter from "eventemitter3";
-import Logger, {ILogger, ILogLevel} from "js-logger";
+import {EventEmitter} from "eventemitter3";
+import { ClientLogger, ELoggerLevel } from "./logger.ts";
 
 export type TBaseClientEventMap = {
   "data"(data: string): void;
@@ -18,7 +19,7 @@ export type TClientConfig = {
   accent_token?: string;
   options?: {
     skip_logo?: boolean;
-    logger_level?: ILogLevel;
+    log_level?: ELoggerLevel
   };
 };
 
@@ -26,7 +27,7 @@ export class BaseClient extends EventEmitter<
   OnebotClient.EventMap & TBaseClientEventMap
 > {
   public connection?: WebSocket;
-  public logger: ILogger;
+  public logger: ClientLogger;
 
   public constructor(
     public readonly bot_user_id: number,
@@ -34,10 +35,7 @@ export class BaseClient extends EventEmitter<
   ) {
     super();
 
-    Logger.useDefaults({
-      defaultLevel: config.options?.logger_level || Logger.INFO
-    });
-    this.logger = Logger.get(`OnebotClient.BaseClient.${bot_user_id}`);
+    this.logger = new ClientLogger(config.options?.log_level);
   }
 
   /**

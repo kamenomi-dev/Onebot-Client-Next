@@ -1,5 +1,5 @@
-import { TStatus } from "./interface";
-import { TGender, TStrangerInfo } from "./user";
+import { TStatus } from "./interface.js";
+import { TGender, TStrangerInfo } from "./user.js";
 
 export type TMessage = {
   time: number;
@@ -545,10 +545,7 @@ export namespace Segment {
   }
 }
 
-export type TElements =
-  | string
-  | Segment.TSegment
-  | Array<Segment.TSegment | string>;
+export type TElements = string | Segment.TSegment | Array<Segment.TSegment>;
 
 export namespace MessageEvent {
   export type TEvent = {
@@ -771,7 +768,7 @@ export namespace MetaEvent {
     meta_event_type: string;
   };
 
-  export type TLifeCycleEvent =TMetaEvent & {
+  export type TLifeCycleEvent = TMetaEvent & {
     post_type: "meta_event";
     meta_event_type: "lifecycle";
     sub_type: "enable" | "disable" | "connect";

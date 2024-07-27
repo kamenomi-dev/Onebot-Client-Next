@@ -1,16 +1,16 @@
 {
   "name": "onebot-client-next",
-  "type": "commonjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
-  "main": "./lib/index.js",
+  "type": "module",
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "dev": "npx mocha",
     "pub": "npm publish --access public",
     "docs": "npx typedoc src/index.ts",
-    "clean": "",
-    "build": "npm run clean && npx tsc -build"
+    "build": "npx tsup"
   },
   "repository": {
     "type": "git",
@@ -29,12 +29,13 @@
     "mocha": "^10.6.0",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
+    "tsup": "^8.2.3",
     "typedoc": "^0.26.4",
     "typescript": "^5.5.3"
   },
   "dependencies": {
     "eventemitter3": "^5.0.1",
-    "js-logger": "^1.6.1",
+    "ts-log": "^2.2.5",
     "ws": "^8.18.0"
   },
   "files": [
@@ -44,8 +45,9 @@
   ],
   "exports": {
     ".": {
-      "require": "./lib/index.js"
-    },
-    "./*": "./*"
+      "import": "./lib/index.js",
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
+    }
   }
 }

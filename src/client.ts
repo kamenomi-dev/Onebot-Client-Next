@@ -1,13 +1,13 @@
-import { TFriendInfo } from "./user";
-import { TGroupInfo, TGroupMemberInfo } from "./group";
-import { BaseClient, TClientConfig } from "./base_client";
+import { TFriendInfo } from "./user.js";
+import { TGroupInfo, TGroupMemberInfo } from "./group.js";
+import { BaseClient, TClientConfig } from "./base_client.js";
 import {
   MessageEvent,
   MetaEvent,
   NoticeEvent,
   RequestEvent,
   TElements,
-} from "./message";
+} from "./message.js";
 
 export class Client extends BaseClient {
   public friend_map = new Map<number, TFriendInfo>();

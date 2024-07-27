@@ -1,12 +1,12 @@
-import { Client } from "./client";
-import Logger from "js-logger";
-import { Group } from "./group";
+import { Client } from "./client.js";
+import { Group } from "./group.js";
+import { ELoggerLevel } from "./logger.js";
 
 const client = new Client(/* user_id */ 222, {
   websocket_address: "ws://127.0.0.1:19132",
   accent_token: "a_simple_token",
   options: {
-    logger_level: Logger.INFO
+    log_level: ELoggerLevel.info
   }
 });
 

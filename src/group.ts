@@ -1,6 +1,6 @@
-import { Client } from "./client";
-import { MessageEvent, TElements } from "./message";
-import { TGender, User } from "./user";
+import { Client } from "./client.js";
+import { MessageEvent, TElements } from "./message.js";
+import { TGender, User } from "./user.js";
 
 export type TGroupInfo = {
   group_id: number;

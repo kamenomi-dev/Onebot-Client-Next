@@ -1,4 +1,4 @@
-import { MessageEvent, NoticeEvent, RequestEvent } from "./message";
+import { MessageEvent, NoticeEvent, RequestEvent } from "./message.js";
 
 export namespace OnebotClient {
   export type MessageEventMap = {
