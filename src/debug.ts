@@ -1,6 +1,6 @@
-import { Client } from "./client.js";
-import { Group } from "./group.js";
-import { ELoggerLevel } from "./logger.js";
+import { Client } from "../lib/index.js";
+import { Group } from "../lib/index.js";
+import { ELoggerLevel } from "../lib/index.js";
 
 const client = new Client(/* user_id */ 222, {
   websocket_address: "ws://127.0.0.1:19132",

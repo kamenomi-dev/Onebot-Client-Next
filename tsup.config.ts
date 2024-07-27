@@ -5,7 +5,7 @@ export default defineConfig({
   format: ["cjs", "esm"],
   entry: ["src/index.ts"],
   outDir: "./lib/",
-  splitting: false,
+  splitting: true,
   dts: true,
   clean: true,
 });
