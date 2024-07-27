@@ -39,7 +39,7 @@
     "ws": "^8.18.0"
   },
   "files": [
-    "lib/**/*.*",
+    "./lib/*.*",
     "LICENSE",
     "readme.md"
   ],
