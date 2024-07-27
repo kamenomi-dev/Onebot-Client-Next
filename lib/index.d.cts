@@ -55,7 +55,7 @@ declare class Friend {
     SendMsg(message: TElements, auto_escape?: boolean): Promise<number>;
     /**
      * SendLike (send_like) 发送好友赞
-     * @param times 赞的次数，每个好友每天最多 10 次，默认为。
+     * @param times 赞的次数，每个好友每天最多 10 次，默认为 1。
      */
     SendLike(times?: number): Promise<void>;
 }
