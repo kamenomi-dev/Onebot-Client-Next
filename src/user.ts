@@ -68,7 +68,7 @@ export class Friend {
 
   /**
    * SendLike (send_like) 发送好友赞
-   * @param times 赞的次数，每个好友每天最多 10 次，默认为。
+   * @param times 赞的次数，每个好友每天最多 10 次，默认为 1。
    */
   public SendLike(times: number = 1) {
     return this.client.CallApi("send_like", { user_id: this.user_id, times })
