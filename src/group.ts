@@ -84,6 +84,23 @@ export class Group {
   }
 
   /**
+   * @llonebot-extension
+   * GetIgnoreAddRequest (get_group_ignore_add_request) 获取已过滤的加群通知
+   */
+  public GetIgnoreAddRequest() {
+    return this.client.CallApi("get_group_ignore_add_request");
+  }
+
+   /**
+   * @llonebot-extension
+   * GetFriendsWithCategory 获取附有分组信息的好友列表
+   */
+   public GetFriendsWithCategory() {
+    return this.client.CallApi("get_friends_with_category");
+  }
+
+
+  /**
    * GetHonorMembers (get_group_honor_info) 获取群荣誉信息
    * @param type 要获取的群荣誉类型，可传入 talkative performer legend strong_newbie emotion 以分别获取单个类型的群荣誉数据，或传入 all 获取所有数据。
    */

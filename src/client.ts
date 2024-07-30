@@ -109,11 +109,9 @@ export class Client extends BaseClient {
 
       if (data.post_type == "message") {
         const messageData = <MessageEvent.TMessageEvent>data;
-        const eventName = [
-          "message",
-          messageData.message_type,
-          messageData.sub_type,
-        ]
+
+        const { message_id, message_type, sub_type } = messageData;
+        const eventName = ["message", message_type, sub_type]
           .filter(Boolean)
           .join(".");
 
@@ -123,7 +121,23 @@ export class Client extends BaseClient {
           this.QuickReply(messageData, message, ...args);
         };
 
-        if (messageData.message_type == "private") {
+        messageData.replyViaEmoji = (emoji_id: number) => {
+          this.CallApi("send_msg_emoji_like", { message_id, emoji_id });
+        };
+
+        messageData.forwardMessage = (target_id: number) => {
+          return this.CallApi(
+            message_type == "private"
+              ? "forward_friend_single_msg"
+              : "forward_group_single_msg",
+            {
+              user_id: target_id,
+              message_id,
+            }
+          );
+        };
+
+        if (message_type == "private") {
           this.EmitEvent(eventName, messageData);
           return;
         }
@@ -230,22 +244,58 @@ export class Client extends BaseClient {
 
   /**
    * @deprecated
-   * SetFriendAddRequest
-   * @param flag 加好友请求的 flag（需从上报的数据中获得）
-   * @param approve 是否同意请求，默认为 true
-   * @param remark 添加后的好友备注（仅在同意时有效），默认为空
+   * SetAvatar (set_qq_avatar) 设置群头像
+   * @param file 支持URI格式的绝对路径、网络 URL 以及 Base64 编码。
+   */
+  public SetAvatar(file: string) {
+    this.CallApi("set_qq_avatar", { file });
+  }
+
+  /**
+   * @deprecated
+   * GetFile (get_file) 下载群/私聊文件
+   * @param file_id 文件ID。
+   */
+  public GetFile(file_id: string) {
+    return this.CallApi("get_file", { file_id });
+  }
+
+  /**
+   * @deprecated
+   * @cq-http
+   * DownloadFile (download_file) 下载文件
+   * @param
+   */
+  public DownloadFile(
+    url: string,
+    thread_count: number,
+    headers: string | Array<string>,
+    base64?: string
+  ) {
+    return this.CallApi("download_file", {
+      url,
+      thread_count,
+      headers,
+      base64,
+    });
+  }
+
+  /**
+   * SetFriendAddRequest 处理好友添加请求
+   * @param flag 加好友请求的 flag（需从上报的数据中获得）。
+   * @param approve 是否同意请求，默认为 true。
+   * @param remark 添加后的好友备注（仅在同意时有效），默认为空。
    */
   public SetFriendAddRequest(flag: string, approve?: boolean, remark?: string) {
     this.CallApi("set_friend_add_request", { flag, approve, remark });
   }
 
   /**
-   * @deprecated
-   * SetGroupAddRequest
-   * @param flag 加群请求的 flag（需从上报的数据中获得）
-   * @param sub_type add 或 invite，请求类型（需要和上报消息中的 sub_type 字段相符）
-   * @param approve 是否同意请求／邀请，默认为 true
-   * @param reason 拒绝理由（仅在拒绝时有效），more为空
+   * SetGroupAddRequest 处理群聊成员添加请求
+   * @param flag 加群请求的 flag（需从上报的数据中获得）。
+   * @param sub_type add 或 invite，请求类型（需要和上报消息中的 sub_type 字段相符）。
+   * @param approve 是否同意请求／邀请，默认为 true。
+   * @param reason 拒绝理由（仅在拒绝时有效），默认为空。
    */
   public SetGroupAddRequest(
     flag: string,
@@ -257,8 +307,18 @@ export class Client extends BaseClient {
   }
 
   /**
+   * @deprecated
+   * SendMessageEmojiLike (send_msg_emoji_like)
+   * @param message_id 消息ID。
+   * @param emoji_id 表情ID，取值范围为 [+4, +128563]。
+   */
+  public SendMessageEmojiLike(message_id: number, emoji_id: number) {
+    this.CallApi("send_msg_emoji_like", { message_id, emoji_id });
+  }
+
+  /**
    * GetMsg 获取消息
-   * @param message_id 消息ID
+   * @param message_id 消息ID。
    */
   public GetMsg(message_id: number) {
     return this.CallApi("get_msg", { message_id });
@@ -266,7 +326,7 @@ export class Client extends BaseClient {
 
   /**
    * GetForwardMsg 获取合并转发消息
-   * @param id 合并转发 ID
+   * @param id 合并转发 ID。
    */
   public GetForwardMsg(id: string) {
     return this.CallApi("get_forward_msg", { id });
@@ -274,7 +334,7 @@ export class Client extends BaseClient {
 
   /**
    * DeleteMsg 撤回消息
-   * @param message_id 消息 ID
+   * @param message_id 消息 ID。
    */
   public DeleteMsg(message_id: number) {
     return this.CallApi("delete_msg", { message_id });
@@ -282,7 +342,7 @@ export class Client extends BaseClient {
 
   /**
    * GetStrangerInfo 获取陌生人信息
-   * @param user_id QQ 号
+   * @param user_id QQ 号。
    */
   public GetStrangerInfo(user_id: number) {
     return this.CallApi("get_stranger_info", { user_id });
@@ -304,7 +364,7 @@ export class Client extends BaseClient {
 
   /**
    * GetGroupMemberList 获取群成员列表
-   * @param group_id 群号
+   * @param group_id 群号。
    */
   public GetGroupMemberList(group_id: number) {
     return this.CallApi("get_group_member_list", { group_id });
@@ -326,7 +386,7 @@ export class Client extends BaseClient {
 
   /**
    * GetVersionInfo 获取版本信息
-   * @returns 本接口仅提供最基础的属性，其他属性见所使用的 Bot 框架文档
+   * @returns 本接口仅提供最基础的属性，其他属性见所使用的 Bot 框架文档。
    */
   public GetVersionInfo() {
     return this.CallApi("get_version_info");
@@ -334,7 +394,7 @@ export class Client extends BaseClient {
 
   /**
    * GetCookies 获取Cookies
-   * @param domain 需要获取 cookies 的域名，默认为空
+   * @param domain 需要获取 cookies 的域名，默认为空。
    */
   public GetCookies(domain: string) {
     return this.CallApi("get_cookies", { domain });
@@ -349,7 +409,7 @@ export class Client extends BaseClient {
 
   /**
    * GetCredentials 获取 QQ 相关接口凭证
-   * @param domain 需要获取 cookies 的域名，默认为空
+   * @param domain 需要获取 cookies 的域名，默认为空。
    */
   public GetCredentails(domain?: string) {
     return this.CallApi("get_credentials", { domain });
@@ -371,7 +431,7 @@ export class Client extends BaseClient {
 
   /**
    * SetRestart 重启 OneBot 实现
-   * @param delay 要延迟的毫秒数，如果默认情况下无法重启，可以尝试设置延迟为 2000 左右，默认为 0
+   * @param delay 要延迟的毫秒数，如果默认情况下无法重启，可以尝试设置延迟为 2000 左右，默认为 0。
    * @description 由于重启 OneBot 实现同时需要重启 API 服务，这意味着当前的 API 请求会被中断，因此需要异步地重启，接口返回的 status 是 async。
    */
   public SetRestart(delay?: number) {

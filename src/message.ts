@@ -35,10 +35,30 @@ export namespace Segment {
     };
   };
 
+  /*
+   * @llonebot-extension
+   * 文件上传
+   */
+  export type TSegmentFile = TSegment & {
+    type: "file";
+    data: {
+      /**
+       * 支持URI格式的绝对路径
+       */
+      file: string;
+      name: string;
+    };
+  };
+
   /* 图片 */
   export type TSegmentImage = TSegmentBase & {
     type: "image";
     data: {
+      /**
+       * @llonebot-extension
+       * 图片预览文字
+       */
+      summary?: string;
       /**
        * 支持URI格式的绝对路径、网络 URL 以及 Base64 编码
        */
@@ -564,6 +584,18 @@ export namespace MessageEvent {
     message: TElements;
     raw_message: string;
     reply(message: TElements, at_sender?: boolean, auto_escape?: boolean): void;
+    /**
+     * @deprecated
+     * 本函数并非是快捷指令，也不是onebot v11协议中有的，此相关api提供自 llonebot 。
+     * @param emoji_id
+     */
+    replyViaEmoji(emoji_id: number): void;
+    /**
+     * @deprecated
+     * 本函数并非是快捷指令，也不是onebot v11协议中有的，此相关api提供自 llonebot 。
+     * @param target_id 支持 群号或者QQ号。
+     */
+    forwardMessage(target_id: number): void;
   };
 
   export type TPrivateMessageEvent = TMessageEvent & {

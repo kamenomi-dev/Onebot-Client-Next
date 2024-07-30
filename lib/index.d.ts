@@ -150,39 +150,45 @@ declare class Client extends BaseClient {
     private EmitEvent;
     /**
      * @deprecated
-     * SetFriendAddRequest
-     * @param flag 加好友请求的 flag（需从上报的数据中获得）
-     * @param approve 是否同意请求，默认为 true
-     * @param remark 添加后的好友备注（仅在同意时有效），默认为空
+     * SetAvatar (set_qq_avatar) 设置群头像
+     * @param file 支持URI格式的绝对路径、网络 URL 以及 Base64 编码。
+     */
+    SetAvatar(file: string): void;
+    /**
+     * @deprecated
+     * SetFriendAddRequest 处理好友添加请求
+     * @param flag 加好友请求的 flag（需从上报的数据中获得）。
+     * @param approve 是否同意请求，默认为 true。
+     * @param remark 添加后的好友备注（仅在同意时有效），默认为空。
      */
     SetFriendAddRequest(flag: string, approve?: boolean, remark?: string): void;
     /**
      * @deprecated
-     * SetGroupAddRequest
-     * @param flag 加群请求的 flag（需从上报的数据中获得）
-     * @param sub_type add 或 invite，请求类型（需要和上报消息中的 sub_type 字段相符）
-     * @param approve 是否同意请求／邀请，默认为 true
-     * @param reason 拒绝理由（仅在拒绝时有效），more为空
+     * SetGroupAddRequest 处理群聊成员添加请求
+     * @param flag 加群请求的 flag（需从上报的数据中获得）。
+     * @param sub_type add 或 invite，请求类型（需要和上报消息中的 sub_type 字段相符）。
+     * @param approve 是否同意请求／邀请，默认为 true。
+     * @param reason 拒绝理由（仅在拒绝时有效），默认为空。
      */
     SetGroupAddRequest(flag: string, sub_type: "add" | "invite", approve?: boolean, reason?: string): void;
     /**
      * GetMsg 获取消息
-     * @param message_id 消息ID
+     * @param message_id 消息ID。
      */
     GetMsg(message_id: number): Promise<TMessage>;
     /**
      * GetForwardMsg 获取合并转发消息
-     * @param id 合并转发 ID
+     * @param id 合并转发 ID。
      */
     GetForwardMsg(id: string): Promise<TElements>;
     /**
      * DeleteMsg 撤回消息
-     * @param message_id 消息 ID
+     * @param message_id 消息 ID。
      */
     DeleteMsg(message_id: number): Promise<void>;
     /**
      * GetStrangerInfo 获取陌生人信息
-     * @param user_id QQ 号
+     * @param user_id QQ 号。
      */
     GetStrangerInfo(user_id: number): Promise<TStrangerInfo>;
     /**
@@ -195,7 +201,7 @@ declare class Client extends BaseClient {
     GetGroupList(): Promise<TGroupInfo[]>;
     /**
      * GetGroupMemberList 获取群成员列表
-     * @param group_id 群号
+     * @param group_id 群号。
      */
     GetGroupMemberList(group_id: number): Promise<TGroupMemberInfo[]>;
     /**
@@ -208,7 +214,7 @@ declare class Client extends BaseClient {
     GetLoginInfo(): Promise<TLoginInfo>;
     /**
      * GetVersionInfo 获取版本信息
-     * @returns 本接口仅提供最基础的属性，其他属性见所使用的 Bot 框架文档
+     * @returns 本接口仅提供最基础的属性，其他属性见所使用的 Bot 框架文档。
      */
     GetVersionInfo(): Promise<{
         app_name: string;
@@ -217,7 +223,7 @@ declare class Client extends BaseClient {
     }>;
     /**
      * GetCookies 获取Cookies
-     * @param domain 需要获取 cookies 的域名，默认为空
+     * @param domain 需要获取 cookies 的域名，默认为空。
      */
     GetCookies(domain: string): Promise<{
         cookies: string;
@@ -230,7 +236,7 @@ declare class Client extends BaseClient {
     }>;
     /**
      * GetCredentials 获取 QQ 相关接口凭证
-     * @param domain 需要获取 cookies 的域名，默认为空
+     * @param domain 需要获取 cookies 的域名，默认为空。
      */
     GetCredentails(domain?: string): Promise<{
         cookies: string;
@@ -250,7 +256,7 @@ declare class Client extends BaseClient {
     }>;
     /**
      * SetRestart 重启 OneBot 实现
-     * @param delay 要延迟的毫秒数，如果默认情况下无法重启，可以尝试设置延迟为 2000 左右，默认为 0
+     * @param delay 要延迟的毫秒数，如果默认情况下无法重启，可以尝试设置延迟为 2000 左右，默认为 0。
      * @description 由于重启 OneBot 实现同时需要重启 API 服务，这意味着当前的 API 请求会被中断，因此需要异步地重启，接口返回的 status 是 async。
      */
     SetRestart(delay?: number): Promise<void>;
@@ -298,6 +304,16 @@ declare class Group {
      * @param cache 是否不使用缓存（使用缓存可能更新不及时，但响应更快），默认为 false。
      */
     GetInfo(cache?: boolean): Promise<TGroupInfo>;
+    /**
+     * @llonebot-extension
+     * GetIgnoreAddRequest (get_group_ignore_add_request) 获取已过滤的加群通知
+     */
+    GetIgnoreAddRequest(): Promise<TGroupIngoreAddRequestInfo>;
+    /**
+    * @llonebot-extension
+    * GetFriendsWithCategory 获取附有分组信息的好友列表
+    */
+    GetFriendsWithCategory(): Promise<TFriendWithCategoryInfo>;
     /**
      * GetHonorMembers (get_group_honor_info) 获取群荣誉信息
      * @param type 要获取的群荣誉类型，可传入 talkative performer legend strong_newbie emotion 以分别获取单个类型的群荣誉数据，或传入 all 获取所有数据。
@@ -408,6 +424,66 @@ type TLoginInfo = {
     user_id: number;
     nickname: string;
 };
+type TFileInfo = {
+    /**
+     * 文件的绝对路径。
+     */
+    file: string;
+    file_name: string;
+    file_size: number;
+    /**
+     * 文件的 base64 编码, 需要在 LLOneBot 的配置文件中开启 base64。
+     */
+    base64: string;
+};
+type TFriendWithCategoryInfo = {
+    categoryId: number;
+    categroyName: string;
+    categroyMbCount: number;
+    buddyList: {
+        uid: string;
+        qid: string;
+        uin: string;
+        nick: string;
+        remark: string;
+        longNick: string;
+        avatarUrl: string;
+        birthday_year: number;
+        birthday_month: number;
+        birthday_day: number;
+        sex: number;
+        topTime: string;
+        isBlock: boolean;
+        isMsgDisturb: boolean;
+        isSpecialCareOpen: boolean;
+        isSpecialCareZone: boolean;
+        ringId: string;
+        status: number;
+        qidianMasterFlag: number;
+        qidianCrewFlag: number;
+        qidianCrewFlag2: number;
+        extStatus: number;
+        categoryId: number;
+        onlyChat: boolean;
+        qzoneNotWatch: boolean;
+        qzoneNotWatched: boolean;
+        vipFlag: boolean;
+        yearVipFlag: boolean;
+        svipFlag: boolean;
+        vipLevel: number;
+        isZPlanCoupleOpen: boolean;
+        zplanCoupleSceneId: number;
+        teenagerFlag: number;
+        studyFlag: number;
+        pendantId: string;
+        vipNameColorId: string;
+    }[];
+}[];
+type TGroupIngoreAddRequestInfo = {
+    group_id: number;
+    user_id: number;
+    flag: string;
+}[];
 /**
  * 不想实现啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
  */
@@ -593,6 +669,63 @@ interface IOnebotExports {
         delay?: number;
     }): void;
     clean_cache(): void;
+    set_qq_avatar(params: {
+        file: string;
+    }): void;
+    /**
+     * @llonebot-extension
+     */
+    get_group_ignore_add_request(): TGroupIngoreAddRequestInfo;
+    /**
+     * @llonebot-extension
+     */
+    get_file(params: {
+        file_id: string;
+    }): TFileInfo;
+    /**
+     * @llonebot-extension
+     * @cq-http
+     */
+    download_file(params: {
+        url: string;
+        /**
+         * @cq-http
+         */
+        base64?: string;
+        thread_count: number;
+        headers: string | Array<string>;
+    }): {
+        file: string;
+    };
+    /**
+     * @llonebot-extension
+     */
+    forward_friend_single_msg(params: {
+        user_id: number;
+        message_id: number;
+    }): void;
+    /**
+     * @llonebot-extension
+     */
+    forward_group_single_msg(params: {
+        group_id: number;
+        message_id: number;
+    }): void;
+    /**
+     * @llonebot-extension
+     */
+    send_msg_emoji_like(params: {
+        message_id: number;
+        /**
+         * 取值范围为 [+4, +128563]
+         * @url https://bot.q.qq.com/wiki/develop/api-v2/openapi/emoji/model.html#EmojiType
+         */
+        emoji_id: number;
+    }): void;
+    /**
+     * @llonebot-extension
+     */
+    get_friends_with_category(): TFriendWithCategoryInfo;
 }
 
 type TMessage = {
@@ -623,9 +756,24 @@ declare namespace Segment {
             id: number;
         };
     };
+    type TSegmentFile = TSegment & {
+        type: "file";
+        data: {
+            /**
+             * 支持URI格式的绝对路径
+             */
+            file: string;
+            name: string;
+        };
+    };
     type TSegmentImage = TSegmentBase & {
         type: "image";
         data: {
+            /**
+             * @llonebot-extension
+             * 图片预览文字
+             */
+            summary?: string;
             /**
              * 支持URI格式的绝对路径、网络 URL 以及 Base64 编码
              */
@@ -1104,4 +1252,4 @@ declare namespace OnebotClient {
     type EventMap = MessageEventMap & NoticeEventMap & RequestEventMap;
 }
 
-export { BaseClient, Client, ClientLogger, ELoggerLevel, Friend, Group, type IOnebotExports, Member, MessageEvent, MetaEvent, NoticeEvent, OnebotClient, RequestEvent, Segment, type TBaseClientEventMap, type TClientConfig, type TElements, type TFriendInfo, type TGender, type TGroupHonorInfo, type TGroupInfo, type TGroupMemberInfo, type TGroupRole, type THonorMemberInfo, type TLoginInfo, type TMessage, type TStatus, type TStrangerInfo, type TUserInfo, User };
+export { BaseClient, Client, ClientLogger, ELoggerLevel, Friend, Group, type IOnebotExports, Member, MessageEvent, MetaEvent, NoticeEvent, OnebotClient, RequestEvent, Segment, type TBaseClientEventMap, type TClientConfig, type TElements, type TFileInfo, type TFriendInfo, type TFriendWithCategoryInfo, type TGender, type TGroupHonorInfo, type TGroupInfo, type TGroupIngoreAddRequestInfo, type TGroupMemberInfo, type TGroupRole, type THonorMemberInfo, type TLoginInfo, type TMessage, type TStatus, type TStrangerInfo, type TUserInfo, User };
