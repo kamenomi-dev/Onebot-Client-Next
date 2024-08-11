@@ -1,5 +1,5 @@
 import { Client } from "./client.js";
-import { MessageEvent, TElements } from "./message.js";
+import { MessageEvent, Segment, TElements } from "./message.js";
 import { TGender, User } from "./user.js";
 
 export type TGroupInfo = {
@@ -84,21 +84,26 @@ export class Group {
   }
 
   /**
-   * @llonebot-extension
    * GetIgnoreAddRequest (get_group_ignore_add_request) 获取已过滤的加群通知
    */
   public GetIgnoreAddRequest() {
     return this.client.CallApi("get_group_ignore_add_request");
   }
 
-   /**
-   * @llonebot-extension
-   * GetFriendsWithCategory 获取附有分组信息的好友列表
+  /**
+   * UploadFile (upload_group_file) 上传群文件
+   * @param file 本地文件绝对路径
+   * @param name 存储名称
+   * @param folder 父目录ID
    */
-   public GetFriendsWithCategory() {
-    return this.client.CallApi("get_friends_with_category");
+  public UploadFile(file: string, name: string, folder?: string) {
+    return this.client.CallApi("upload_group_file", {
+      group_id: this.group_id,
+      file,
+      name,
+      folder,
+    });
   }
-
 
   /**
    * GetHonorMembers (get_group_honor_info) 获取群荣誉信息
@@ -252,11 +257,30 @@ export class Group {
    * @param message 要发送的内容。
    * @param auto_escape 消息内容是否作为纯文本发送（即不解析 CQ 码），只在 message 字段是字符串时有效，默认为 false。
    */
-  public SendMsg(message: TElements, auto_escape: boolean = false) {
+  public SendMessage(message: TElements, auto_escape: boolean = false) {
     return this.client.CallApi("send_group_msg", {
       group_id: this.group_id,
       message,
       auto_escape,
+    });
+  }
+
+  public SendForwardMessage(messages: Segment.TSegment[]) {
+    return this.client.CallApi("send_group_forward_msg", {
+      group_id: this.group_id,
+      messages,
+    });
+  }
+
+  /**
+   * GetMessageHistory (get_group_msg_history) 获取群历史消息
+   * @param message_seq 获取从seq以上的消息，默认为 空，即获取最新消息。
+   * @returns 获取消息类型数组，最大数组长度为 19 。
+   */
+  public GetMessageHistory(message_seq?: number) {
+    return this.client.CallApi("get_group_msg_history", {
+      message_seq,
+      group_id: this.group_id,
     });
   }
 }

@@ -40,24 +40,29 @@ declare class User {
     AsStrangerInfo(user_id: number): Promise<TStrangerInfo>;
     AsFriend(): Friend;
     AsMember(group_id: number): Member;
+    /**
+     * SendLike 点赞
+     * @param times 点赞次数，最多为 10，默认为 1 。
+     */
     SendLike(times?: number): Promise<void>;
+    /**
+     * SendMessage (send_private_msg) 发送私聊消息
+     * @param message 要发送的内容。
+     */
+    SendMessage(message: TElements, auto_escape?: boolean): Promise<number>;
+    /**
+     * SendForwardMessage (send_private_forward_msg) 发送私聊合并转发消息
+     * @param messages 要发送的合并转发内容。
+     */
+    SendForwardMessage(messages: Segment.TSegment[]): Promise<{
+        message_id: number;
+        forward_id: number;
+    }>;
 }
-declare class Friend {
-    private client;
-    protected user_id: number;
+declare class Friend extends User {
     info: TFriendInfo;
     constructor(client: Client, user_id: number);
     static As(client: Client, uid: number): Friend;
-    /**
-     * SendMsg (send_private_msg) 发送私聊消息
-     * @param message 要发送的内容。
-     */
-    SendMsg(message: TElements, auto_escape?: boolean): Promise<number>;
-    /**
-     * SendLike (send_like) 发送好友赞
-     * @param times 赞的次数，每个好友每天最多 10 次，默认为 1。
-     */
-    SendLike(times?: number): Promise<void>;
 }
 
 type TBaseClientEventMap = {
@@ -149,13 +154,26 @@ declare class Client extends BaseClient {
     private InitEventListener;
     private EmitEvent;
     /**
-     * @deprecated
+     * GetFriendsWithCategory 获取附有分组信息的好友列表
+     */
+    GetFriendsWithCategory(): Promise<TFriendWithCategoryInfo>;
+    /**
      * SetAvatar (set_qq_avatar) 设置群头像
      * @param file 支持URI格式的绝对路径、网络 URL 以及 Base64 编码。
      */
     SetAvatar(file: string): void;
     /**
-     * @deprecated
+     * GetFile (get_file) 下载群/私聊文件
+     * @param file_id 文件ID。
+     */
+    GetFile(file_id: string): Promise<TFileInfo>;
+    /**
+     * DownloadFile (download_file) 下载文件
+     */
+    DownloadFile(url: string, thread_count: number, headers: string | Array<string>, base64?: string): Promise<{
+        file: string;
+    }>;
+    /**
      * SetFriendAddRequest 处理好友添加请求
      * @param flag 加好友请求的 flag（需从上报的数据中获得）。
      * @param approve 是否同意请求，默认为 true。
@@ -163,7 +181,6 @@ declare class Client extends BaseClient {
      */
     SetFriendAddRequest(flag: string, approve?: boolean, remark?: string): void;
     /**
-     * @deprecated
      * SetGroupAddRequest 处理群聊成员添加请求
      * @param flag 加群请求的 flag（需从上报的数据中获得）。
      * @param sub_type add 或 invite，请求类型（需要和上报消息中的 sub_type 字段相符）。
@@ -171,6 +188,13 @@ declare class Client extends BaseClient {
      * @param reason 拒绝理由（仅在拒绝时有效），默认为空。
      */
     SetGroupAddRequest(flag: string, sub_type: "add" | "invite", approve?: boolean, reason?: string): void;
+    /**
+     * @deprecated
+     * SendMessageEmojiLike (send_msg_emoji_like)
+     * @param message_id 消息ID。
+     * @param emoji_id 表情ID，取值范围为 [+4, +128563]。
+     */
+    SendMessageEmojiLike(message_id: number, emoji_id: number): void;
     /**
      * GetMsg 获取消息
      * @param message_id 消息ID。
@@ -180,7 +204,7 @@ declare class Client extends BaseClient {
      * GetForwardMsg 获取合并转发消息
      * @param id 合并转发 ID。
      */
-    GetForwardMsg(id: string): Promise<TElements>;
+    GetForwardMsg(id: string): Promise<Segment.TSegment[]>;
     /**
      * DeleteMsg 撤回消息
      * @param message_id 消息 ID。
@@ -305,15 +329,16 @@ declare class Group {
      */
     GetInfo(cache?: boolean): Promise<TGroupInfo>;
     /**
-     * @llonebot-extension
      * GetIgnoreAddRequest (get_group_ignore_add_request) 获取已过滤的加群通知
      */
     GetIgnoreAddRequest(): Promise<TGroupIngoreAddRequestInfo>;
     /**
-    * @llonebot-extension
-    * GetFriendsWithCategory 获取附有分组信息的好友列表
-    */
-    GetFriendsWithCategory(): Promise<TFriendWithCategoryInfo>;
+     * UploadFile (upload_group_file) 上传群文件
+     * @param file 本地文件绝对路径
+     * @param name 存储名称
+     * @param folder 父目录ID
+     */
+    UploadFile(file: string, name: string, folder?: string): Promise<void>;
     /**
      * GetHonorMembers (get_group_honor_info) 获取群荣誉信息
      * @param type 要获取的群荣誉类型，可传入 talkative performer legend strong_newbie emotion 以分别获取单个类型的群荣誉数据，或传入 all 获取所有数据。
@@ -379,7 +404,17 @@ declare class Group {
      * @param message 要发送的内容。
      * @param auto_escape 消息内容是否作为纯文本发送（即不解析 CQ 码），只在 message 字段是字符串时有效，默认为 false。
      */
-    SendMsg(message: TElements, auto_escape?: boolean): Promise<number>;
+    SendMessage(message: TElements, auto_escape?: boolean): Promise<number>;
+    SendForwardMessage(messages: Segment.TSegment[]): Promise<{
+        message_id: number;
+        forward_id: number;
+    }>;
+    /**
+     * GetMessageHistory (get_group_msg_history) 获取群历史消息
+     * @param message_seq 获取从seq以上的消息，默认为 空，即获取最新消息。
+     * @returns 获取消息类型数组，最大数组长度为 19 。
+     */
+    GetMessageHistory(message_seq?: number): Promise<Segment.TSegment[]>;
 }
 declare class Member extends User {
     readonly group_id: number;
@@ -541,7 +576,7 @@ interface IOnebotExports {
     }): TMessage;
     get_forward_msg(params: {
         id: string;
-    }): TElements;
+    }): Segment.TSegment[];
     send_like(params: {
         user_id: number;
         times?: number;
@@ -672,48 +707,18 @@ interface IOnebotExports {
     set_qq_avatar(params: {
         file: string;
     }): void;
-    /**
-     * @llonebot-extension
-     */
     get_group_ignore_add_request(): TGroupIngoreAddRequestInfo;
-    /**
-     * @llonebot-extension
-     */
     get_file(params: {
         file_id: string;
     }): TFileInfo;
-    /**
-     * @llonebot-extension
-     * @cq-http
-     */
-    download_file(params: {
-        url: string;
-        /**
-         * @cq-http
-         */
-        base64?: string;
-        thread_count: number;
-        headers: string | Array<string>;
-    }): {
-        file: string;
-    };
-    /**
-     * @llonebot-extension
-     */
     forward_friend_single_msg(params: {
         user_id: number;
         message_id: number;
     }): void;
-    /**
-     * @llonebot-extension
-     */
     forward_group_single_msg(params: {
         group_id: number;
         message_id: number;
     }): void;
-    /**
-     * @llonebot-extension
-     */
     send_msg_emoji_like(params: {
         message_id: number;
         /**
@@ -722,10 +727,40 @@ interface IOnebotExports {
          */
         emoji_id: number;
     }): void;
-    /**
-     * @llonebot-extension
-     */
     get_friends_with_category(): TFriendWithCategoryInfo;
+    send_forward_msg(): any;
+    send_group_forward_msg(params: {
+        group_id: number;
+        messages: Segment.TSegment[];
+    }): {
+        message_id: number;
+        forward_id: number;
+    };
+    send_private_forward_msg(params: {
+        user_id: number;
+        messages: Segment.TSegment[];
+    }): {
+        message_id: number;
+        forward_id: number;
+    };
+    get_group_msg_history(params: {
+        message_seq?: number;
+        group_id: number;
+    }): Segment.TSegment[];
+    upload_group_file(params: {
+        group_id: number;
+        file: string;
+        name: string;
+        folder?: string;
+    }): void;
+    download_file(params: {
+        url: string;
+        base64?: string;
+        thread_count: number;
+        headers: string | Array<string>;
+    }): {
+        file: string;
+    };
 }
 
 type TMessage = {
@@ -1038,6 +1073,18 @@ declare namespace MessageEvent {
         message: TElements;
         raw_message: string;
         reply(message: TElements, at_sender?: boolean, auto_escape?: boolean): void;
+        /**
+         * @deprecated
+         * 本函数并非是快捷指令，也不是onebot v11协议中有的，此相关api提供自 llonebot 。
+         * @param emoji_id
+         */
+        replyViaEmoji(emoji_id: number): void;
+        /**
+         * @deprecated
+         * 本函数并非是快捷指令，也不是onebot v11协议中有的，此相关api提供自 llonebot 。
+         * @param target_id 支持 群号或者QQ号。
+         */
+        forwardMessage(target_id: number): void;
     };
     type TPrivateMessageEvent = TMessageEvent & {
         message_type: "private";

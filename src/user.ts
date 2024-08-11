@@ -1,13 +1,13 @@
 import { Client } from "./client.js";
 import { Member } from "./group.js";
-import { TElements } from "./message.js";
+import { Segment, TElements } from "./message.js";
 
 export type TGender = "male" | "female" | "unknown";
 
 export type TUserInfo = {
   user_id: number;
   nickname: string;
-}
+};
 
 export type TStrangerInfo = TUserInfo & {
   sex: TGender;
@@ -36,15 +36,44 @@ export class User {
     return Member.As(this.client, group_id, this.user_id);
   }
 
+  /**
+   * SendLike 点赞
+   * @param times 点赞次数，最多为 10，默认为 1 。
+   */
   public SendLike(times?: number) {
     return this.client.CallApi("send_like", { user_id: this.user_id, times });
   }
+
+  /**
+   * SendMessage (send_private_msg) 发送私聊消息
+   * @param message 要发送的内容。
+   */
+  public SendMessage(message: TElements, auto_escape: boolean = false) {
+    return this.client.CallApi("send_private_msg", {
+      user_id: this.user_id,
+      message,
+      auto_escape,
+    });
+  }
+
+  /**
+   * SendForwardMessage (send_private_forward_msg) 发送私聊合并转发消息
+   * @param messages 要发送的合并转发内容。
+   */
+  public SendForwardMessage(messages: Segment.TSegment[]) {
+    return this.client.CallApi("send_private_forward_msg", {
+      user_id: this.user_id,
+      messages,
+    });
+  }
 }
 
-export class Friend {
+// @ts-ignore // Skip here, We need to call "as" from Friend, not User.
+export class Friend extends User {
   public info: TFriendInfo;
 
-  public constructor(private client: Client, protected user_id: number) {
+  public constructor(client: Client, user_id: number) {
+    super(client, user_id);
     this.info = <TFriendInfo>client.friend_map.get(this.user_id);
   }
 
@@ -56,21 +85,5 @@ export class Friend {
     }
 
     return new Friend(client, uid);
-  }
-
-  /**
-   * SendMsg (send_private_msg) 发送私聊消息
-   * @param message 要发送的内容。
-   */
-  public SendMsg(message: TElements, auto_escape: boolean = false) {
-    return this.client.CallApi("send_private_msg", { user_id: this.user_id, message, auto_escape });
-  }
-
-  /**
-   * SendLike (send_like) 发送好友赞
-   * @param times 赞的次数，每个好友每天最多 10 次，默认为 1。
-   */
-  public SendLike(times: number = 1) {
-    return this.client.CallApi("send_like", { user_id: this.user_id, times })
   }
 }

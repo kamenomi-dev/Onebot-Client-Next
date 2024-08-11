@@ -28,7 +28,7 @@ client.Start().then(() => {
     group.GetHonorMembers("all").then((dragon) => {
       if (dragon.current_talkative!.user_id != lastDragon) {
         lastDragon = dragon.current_talkative!.user_id
-        group.SendMsg(`${dragon.current_talkative!.nickname} 龙王，喷个水`);
+        group.SendMessage(`${dragon.current_talkative!.nickname} 龙王，喷个水`);
       }
       console.log(dragon)
     }).catch(val => {

@@ -1,5 +1,5 @@
 import { TGroupInfo, TGroupMemberInfo } from "./group.js";
-import { TElements, TMessage, MessageEvent } from "./message.js";
+import { TElements, TMessage, MessageEvent, Segment } from "./message.js";
 import { TFriendInfo, TStrangerInfo, TUserInfo } from "./user.js";
 
 export type TStatus = { online: boolean; good: boolean };
@@ -113,7 +113,7 @@ export interface IOnebotExports {
   }): number;
   delete_msg(params: { message_id: number }): void;
   get_msg(params: { message_id: number }): TMessage;
-  get_forward_msg(params: { id: string }): TElements;
+  get_forward_msg(params: { id: string }): Segment.TSegment[];
   send_like(params: { user_id: number; times?: number }): void;
   set_group_kick(params: {
     group_id: number;
@@ -205,48 +205,20 @@ export interface IOnebotExports {
   set_restart(params: { delay?: number }): void;
   clean_cache(): void;
 
-  /*
-   * @llonebot-extension
-   */
+  // The apis are provided by LLOnebot.
+  // https://llonebot.github.io/zh-CN/develop/extends_api
+
   set_qq_avatar(params: { file: string }): void;
-  /**
-   * @llonebot-extension
-   */
   get_group_ignore_add_request(): TGroupIngoreAddRequestInfo;
-  /**
-   * @llonebot-extension
-   */
   get_file(params: { file_id: string }): TFileInfo;
-  /**
-   * @llonebot-extension
-   * @cq-http
-   */
-  download_file(params: {
-    url: string;
-    /**
-     * @llonebot-extension
-     */
-    base64?: string;
-    thread_count: number;
-    headers: string | Array<string>;
-  }): { file: string };
-  /**
-   * @llonebot-extension
-   */
   forward_friend_single_msg(params: {
     user_id: number;
     message_id: number;
   }): void;
-  /**
-   * @llonebot-extension
-   */
   forward_group_single_msg(params: {
     group_id: number;
     message_id: number;
   }): void;
-  /**
-   * @llonebot-extension
-   */
   send_msg_emoji_like(params: {
     message_id: number;
     /**
@@ -255,8 +227,34 @@ export interface IOnebotExports {
      */
     emoji_id: number;
   }): void;
-  /**
-   * @llonebot-extension
-   */
   get_friends_with_category(): TFriendWithCategoryInfo;
+
+  // The apis are based on Go-Cqhttp and provided by LLOneBot.
+  // https://llonebot.github.io/zh-CN/develop/api
+
+  send_forward_msg(): any;
+  send_group_forward_msg(params: {
+    group_id: number;
+    messages: Segment.TSegment[];
+  }): { message_id: number; forward_id: number };
+  send_private_forward_msg(params: {
+    user_id: number;
+    messages: Segment.TSegment[];
+  }): { message_id: number; forward_id: number };
+  get_group_msg_history(params: {
+    message_seq?: number;
+    group_id: number;
+  }): Segment.TSegment[];
+  upload_group_file(params: {
+    group_id: number;
+    file: string;
+    name: string;
+    folder?: string;
+  }): void;
+  download_file(params: {
+    url: string;
+    base64?: string;
+    thread_count: number;
+    headers: string | Array<string>;
+  }): { file: string };
 }

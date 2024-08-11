@@ -243,7 +243,13 @@ export class Client extends BaseClient {
   }
 
   /**
-   * @deprecated
+   * GetFriendsWithCategory 获取附有分组信息的好友列表
+   */
+  public GetFriendsWithCategory() {
+    return this.CallApi("get_friends_with_category");
+  }
+
+  /**
    * SetAvatar (set_qq_avatar) 设置群头像
    * @param file 支持URI格式的绝对路径、网络 URL 以及 Base64 编码。
    */
@@ -252,7 +258,6 @@ export class Client extends BaseClient {
   }
 
   /**
-   * @deprecated
    * GetFile (get_file) 下载群/私聊文件
    * @param file_id 文件ID。
    */
@@ -261,10 +266,7 @@ export class Client extends BaseClient {
   }
 
   /**
-   * @deprecated
-   * @cq-http
    * DownloadFile (download_file) 下载文件
-   * @param
    */
   public DownloadFile(
     url: string,
