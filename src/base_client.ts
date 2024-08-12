@@ -1,14 +1,13 @@
 import { OnebotClient } from "./event.js";
-import { IOnebotExports } from "./interface.js";
+import { IOnebotExports, TApiCallback } from "./interface.js";
 import { MessageEvent, RequestEvent, TElements } from "./message.js";
 
-import Console from "console"
 import WebSocket from "ws";
 import {EventEmitter} from "eventemitter3";
 import { ClientLogger, ELoggerLevel } from "./logger.ts";
 
 export type TBaseClientEventMap = {
-  "data"(data: string): void;
+  "data"(data: TApiCallback): void;
   "open"(event: WebSocket.Event): void;
   "error"(event: WebSocket.ErrorEvent): void;
   "close"(event: WebSocket.CloseEvent): void;
@@ -88,7 +87,7 @@ export class BaseClient extends EventEmitter<
     const params = args.at(0) || {};
 
     return new Promise<any>((resolve, reject) => {
-      var messageHandler = (data: any) => {
+      var messageHandler = (data: TApiCallback) => {
         if (data.echo !== timestamp) {
           return;
         }
@@ -96,7 +95,7 @@ export class BaseClient extends EventEmitter<
         if (data.status === "ok") {
           resolve(data.data);
         } else {
-          reject(data.error);
+          reject(data);
         }
 
         this.off("data", messageHandler);
@@ -209,7 +208,6 @@ export class BaseClient extends EventEmitter<
 
     if (data["status"] == "failed") {
       this.emit("error", data);
-      return;
     }
 
     this.logger.debug(`Message Received! ${event.data.toString()}`);

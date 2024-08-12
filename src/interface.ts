@@ -2,6 +2,13 @@ import { TGroupInfo, TGroupMemberInfo } from "./group.js";
 import { TElements, TMessage, MessageEvent, Segment } from "./message.js";
 import { TFriendInfo, TStrangerInfo, TUserInfo } from "./user.js";
 
+export type TApiCallback = {
+  status: "failed" | "ok";
+  retcode: 0 | 1400 | 1401 | 1402 | 1403 | 1404;
+  data: object | null;
+  echo: any;
+};
+
 export type TStatus = { online: boolean; good: boolean };
 
 export type TLoginInfo = {
@@ -219,7 +226,7 @@ export interface IOnebotExports {
     group_id: number;
     message_id: number;
   }): void;
-  send_msg_emoji_like(params: {
+  set_msg_emoji_like(params: {
     message_id: number;
     /**
      * 取值范围为 [+4, +128563]

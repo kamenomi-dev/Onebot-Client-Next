@@ -103,7 +103,7 @@ export class Client extends BaseClient {
 
   private InitEventListener() {
     this.connection?.on("message", (rawData) => {
-      const data = <MessageEvent.TEvent>JSON.parse(rawData.toString());
+      const data = <MessageEvent.TBaseEvent>JSON.parse(rawData.toString());
 
       // Message
 
@@ -122,7 +122,7 @@ export class Client extends BaseClient {
         };
 
         messageData.replyViaEmoji = (emoji_id: number) => {
-          this.CallApi("send_msg_emoji_like", { message_id, emoji_id });
+          this.CallApi("set_msg_emoji_like", { message_id, emoji_id });
         };
 
         messageData.forwardMessage = (target_id: number) => {
@@ -310,12 +310,12 @@ export class Client extends BaseClient {
 
   /**
    * @deprecated
-   * SendMessageEmojiLike (send_msg_emoji_like)
+   * SetMessageEmojiLike (set_msg_emoji_like)
    * @param message_id 消息ID。
    * @param emoji_id 表情ID，取值范围为 [+4, +128563]。
    */
-  public SendMessageEmojiLike(message_id: number, emoji_id: number) {
-    this.CallApi("send_msg_emoji_like", { message_id, emoji_id });
+  public SetMessageEmojiLike(message_id: number, emoji_id: number) {
+    this.CallApi("set_msg_emoji_like", { message_id, emoji_id });
   }
 
   /**

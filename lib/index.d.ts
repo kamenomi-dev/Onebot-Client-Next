@@ -66,7 +66,7 @@ declare class Friend extends User {
 }
 
 type TBaseClientEventMap = {
-    "data"(data: string): void;
+    "data"(data: TApiCallback): void;
     "open"(event: WebSocket.Event): void;
     "error"(event: WebSocket.ErrorEvent): void;
     "close"(event: WebSocket.CloseEvent): void;
@@ -190,11 +190,11 @@ declare class Client extends BaseClient {
     SetGroupAddRequest(flag: string, sub_type: "add" | "invite", approve?: boolean, reason?: string): void;
     /**
      * @deprecated
-     * SendMessageEmojiLike (send_msg_emoji_like)
+     * SetMessageEmojiLike (set_msg_emoji_like)
      * @param message_id 消息ID。
      * @param emoji_id 表情ID，取值范围为 [+4, +128563]。
      */
-    SendMessageEmojiLike(message_id: number, emoji_id: number): void;
+    SetMessageEmojiLike(message_id: number, emoji_id: number): void;
     /**
      * GetMsg 获取消息
      * @param message_id 消息ID。
@@ -451,6 +451,12 @@ declare class Member extends User {
     SetSpecialTitle(special_title?: string, duration?: number): Promise<void>;
 }
 
+type TApiCallback = {
+    status: "failed" | "ok";
+    retcode: 0 | 1400 | 1401 | 1402 | 1403 | 1404;
+    data: object | null;
+    echo: any;
+};
 type TStatus = {
     online: boolean;
     good: boolean;
@@ -719,7 +725,7 @@ interface IOnebotExports {
         group_id: number;
         message_id: number;
     }): void;
-    send_msg_emoji_like(params: {
+    set_msg_emoji_like(params: {
         message_id: number;
         /**
          * 取值范围为 [+4, +128563]
@@ -1058,12 +1064,12 @@ declare namespace Segment {
 }
 type TElements = string | Segment.TSegment | Array<Segment.TSegment>;
 declare namespace MessageEvent {
-    type TEvent = {
+    type TBaseEvent = {
         time: number;
         self_id: number;
         post_type: string;
     };
-    type TMessageEvent = TEvent & {
+    type TMessageEvent = TBaseEvent & {
         post_type: "message";
         sub_type: string;
         message_type: "private" | "group";
@@ -1144,7 +1150,7 @@ declare namespace MessageEvent {
     };
 }
 declare namespace NoticeEvent {
-    type TNoticeEvent = MessageEvent.TEvent & {
+    type TNoticeEvent = MessageEvent.TBaseEvent & {
         post_type: "notice";
         notice_type: string;
     };
@@ -1220,7 +1226,7 @@ declare namespace NoticeEvent {
     };
 }
 declare namespace RequestEvent {
-    type TRequestEvent = MessageEvent.TEvent & {
+    type TRequestEvent = MessageEvent.TBaseEvent & {
         post_type: "request";
         request_type: "friend" | "group";
         user_id: number;
@@ -1252,7 +1258,7 @@ declare namespace RequestEvent {
     };
 }
 declare namespace MetaEvent {
-    type TMetaEvent = MessageEvent.TEvent & {
+    type TMetaEvent = MessageEvent.TBaseEvent & {
         post_type: "meta_event";
         meta_event_type: string;
     };
@@ -1299,4 +1305,4 @@ declare namespace OnebotClient {
     type EventMap = MessageEventMap & NoticeEventMap & RequestEventMap;
 }
 
-export { BaseClient, Client, ClientLogger, ELoggerLevel, Friend, Group, type IOnebotExports, Member, MessageEvent, MetaEvent, NoticeEvent, OnebotClient, RequestEvent, Segment, type TBaseClientEventMap, type TClientConfig, type TElements, type TFileInfo, type TFriendInfo, type TFriendWithCategoryInfo, type TGender, type TGroupHonorInfo, type TGroupInfo, type TGroupIngoreAddRequestInfo, type TGroupMemberInfo, type TGroupRole, type THonorMemberInfo, type TLoginInfo, type TMessage, type TStatus, type TStrangerInfo, type TUserInfo, User };
+export { BaseClient, Client, ClientLogger, ELoggerLevel, Friend, Group, type IOnebotExports, Member, MessageEvent, MetaEvent, NoticeEvent, OnebotClient, RequestEvent, Segment, type TApiCallback, type TBaseClientEventMap, type TClientConfig, type TElements, type TFileInfo, type TFriendInfo, type TFriendWithCategoryInfo, type TGender, type TGroupHonorInfo, type TGroupInfo, type TGroupIngoreAddRequestInfo, type TGroupMemberInfo, type TGroupRole, type THonorMemberInfo, type TLoginInfo, type TMessage, type TStatus, type TStrangerInfo, type TUserInfo, User };

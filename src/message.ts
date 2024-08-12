@@ -568,13 +568,13 @@ export namespace Segment {
 export type TElements = string | Segment.TSegment | Array<Segment.TSegment>;
 
 export namespace MessageEvent {
-  export type TEvent = {
+  export type TBaseEvent = {
     time: number;
     self_id: number;
     post_type: string;
   };
 
-  export type TMessageEvent = TEvent & {
+  export type TMessageEvent = TBaseEvent & {
     post_type: "message";
     sub_type: string;
     message_type: "private" | "group";
@@ -662,7 +662,7 @@ export namespace MessageEvent {
 }
 
 export namespace NoticeEvent {
-  export type TNoticeEvent = MessageEvent.TEvent & {
+  export type TNoticeEvent = MessageEvent.TBaseEvent & {
     post_type: "notice";
     notice_type: string;
   };
@@ -758,7 +758,7 @@ export namespace NoticeEvent {
 }
 
 export namespace RequestEvent {
-  export type TRequestEvent = MessageEvent.TEvent & {
+  export type TRequestEvent = MessageEvent.TBaseEvent & {
     post_type: "request";
     request_type: "friend" | "group";
     user_id: number;
@@ -795,7 +795,7 @@ export namespace RequestEvent {
 }
 
 export namespace MetaEvent {
-  export type TMetaEvent = MessageEvent.TEvent & {
+  export type TMetaEvent = MessageEvent.TBaseEvent & {
     post_type: "meta_event";
     meta_event_type: string;
   };
