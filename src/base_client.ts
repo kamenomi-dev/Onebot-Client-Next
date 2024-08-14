@@ -196,7 +196,7 @@ export class BaseClient extends EventEmitter<
   }
 
   private __OpenHandler(event: WebSocket.Event) {
-    this.logger.debug(
+    this.logger.info(
       `Success to connect server ${this.config.websocket_address} with token ${this.config.accent_token}`
     );
 
@@ -222,7 +222,7 @@ export class BaseClient extends EventEmitter<
   }
 
   private __CloseHandler(event: any) {
-    this.logger.debug(
+    this.logger.info(
       `Success to disconnet from server ${this.config.websocket_address}`
     );
 

@@ -1,6 +1,6 @@
 {
   "name": "onebot-client-next",
-  "version": "1.0.4-prelease",
+  "version": "1.0.4-dev",
   "description": "A QQ bot library supports onebot v11 protocol based on LLOneBot",
   "type": "module",
   "main": "./lib/index.cjs",
@@ -34,6 +34,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@poppinss/cliui": "^6.4.1",
     "eventemitter3": "^5.0.1",
     "ts-log": "^2.2.5",
     "ws": "^8.18.0"
