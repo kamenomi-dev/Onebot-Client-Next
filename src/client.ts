@@ -91,6 +91,11 @@ export class Client extends BaseClient {
 
     this.InitEventListener();
     this.logger.info(`All event listener was registered. `);
+
+    // Emit event
+
+    this.emit("system.connect");
+
     return this;
   }
 

@@ -3,7 +3,7 @@ import { IOnebotExports, TApiCallback } from "./interface.js";
 import { MessageEvent, RequestEvent, TElements } from "./message.js";
 
 import WebSocket from "ws";
-import {EventEmitter} from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { ClientLogger, ELoggerLevel } from "./logger.ts";
 
 export type TBaseClientEventMap = {
@@ -11,6 +11,9 @@ export type TBaseClientEventMap = {
   "open"(event: WebSocket.Event): void;
   "error"(event: WebSocket.ErrorEvent): void;
   "close"(event: WebSocket.CloseEvent): void;
+
+  "system.connect"(): void;
+  "system.disconnect"(): void;
 };
 
 export type TClientConfig = {
@@ -18,7 +21,7 @@ export type TClientConfig = {
   accent_token?: string;
   options?: {
     skip_logo?: boolean;
-    log_level?: ELoggerLevel
+    log_level?: ELoggerLevel;
   };
 };
 
@@ -226,6 +229,7 @@ export class BaseClient extends EventEmitter<
       `Success to disconnet from server ${this.config.websocket_address}`
     );
 
+    this.emit("system.disconnect");
     this.emit("close", event);
   }
 }
